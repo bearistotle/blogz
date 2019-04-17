@@ -23,31 +23,45 @@ db = SQLALchemy(app)
 app.secret_key = 'P0uMx81vjH'
 
 # create classes for tables in db (user, post)
-class Post(db.Model):
+class Blog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120))
     keywords = db.Column(db.String(120))
     body = db.Column(db.String(10000))
-    owner = db.Column(db.Integer, db.ForeignKey('user.id'))
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    def __init__(self, title, keywords, body, owner):
+    def __init__(self, title, keywords, body, owner_id):
         self.title = title
         self.keywords = keywords
         self.body = body
-        self.owner = owner 
+        self.owner_id = owner_id
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), unique=True)
     password = db.Column(db.String(120))
-    posts = db.relationship('Post', backref='owner')
+    posts = db.relationship('Blog', backref='owner')
 
     def __init__(self, username, password):
         self.username = username
         self.password = password
 
-# create handlers/routes for main page, blog post form page, posted blog page
+# TODO: create handlers/routes for main page, blog post form page, posted blog page
 
+@app.route('/', methods=['GET', 'POST'])
+def index():
+
+    # pull data from db on old posts, pass to index.html on render call?
+
+    return render_template("index.html")
+
+@app.route('/new-post', methods=['GET', 'POST'])
+def new_post():
+    return render_template("new_post.html")
+
+@app.route('/view-post', methods=['GET', 'POST'])
+def view_post():
+    return render_template("view_post.html")
 
 # allow for importing without automatic execution of this file
 if __name__ == "__main__":
