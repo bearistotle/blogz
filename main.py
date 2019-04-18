@@ -73,23 +73,38 @@ def new_post():
 
 @app.route('/viewpost', methods=['GET', 'POST'])
 def view_post():
-    # collect form data, validate, add to db
-    title = request.form['title']
-    body = request.form['body']
-    keywords = request.form['keywords']
+    # if method is POST, then pull data from form submitted by newpost
+    if request.method == 'POST':
+        # collect form data, validate, add to db
+        title = request.form['title']
+        body = request.form['body']
+        keywords = request.form['keywords']
 
-    # TODO: validate and redirect to newpost page with error msgs
-    # add form data to db
-    new_blog = Blog(title, keywords, body)
-    db.session.add(new_blog)
-    db.session.commit()
+        # TODO: validate and redirect to newpost page with error msgs
+        # add form data to db
+        new_blog = Blog(title, keywords, body)
+        db.session.add(new_blog)
+        db.session.commit()
 
-    date = new_blog.date
+        date = new_blog.date
 
-    # pass form data to viewpost.html and render it
-    return render_template("viewpost.html", title=title, date=date, keywords=keywords, 
-    body=body)
+        # pass form data to viewpost.html and render it
+        return render_template("viewpost.html", title=title, date=date, keywords=keywords, 
+        body=body)
+    
+    # if method is GET, then pull blog_id from query parameter, get blog from db
+    elif request.method == 'GET':
+        old_blog_id = request.args.get('id')
+        old_blog = Blog.query.get(old_blog_id)
 
+        title = old_blog.title
+        date = old_blog.date
+        keywords = old_blog.keywords
+        body = old_blog.body
+
+        return render_template('viewpost.html', title=title, date=date, keywords=keywords, body=body)
+    else:
+        return redirect('/blog')
 # allow for importing without automatic execution of this file
 if __name__ == "__main__":
     app.run()

@@ -5,7 +5,7 @@
 
 <!--display all posts-->
 {% for blog in blogs %}
-  <h2>{{ blog.title }}</h2>
+  <a href='/viewpost?id={{ blog.blog_id }}'><h2>{{ blog.title }}</h2></a>
   <p id='timestamp'>{{ blog.date }}</p>
   <p id='keywords'>{{ blog.keywords }}</p>
   <p id='body'>{{ blog.body }}</p>
