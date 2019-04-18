@@ -2,11 +2,16 @@
 <html>
 <head>
   <link href='/static/style.css' rel='stylesheet' type='text/css' />
-  <!--TODO: create link index at top of all pages-->
-  <a href='/blog'>Index</a>
-  <a href='/newpost'>Write a New Post</a>
 </head>
   <body>
+    <div class='sidebar'>
+      <ul class='side-ul'>
+        <li><a class='side-link' href='/blog'>index</a></li><br>
+        <li><a class='side-link' href='/newpost'>new post</a></li><br>
+        <li><a class='side-link' href='/blog'>login</a></li><br>
+        <li><a class='side-link' href='/blog'>register</a></li><br>
+      </ul>
+    </div>
     <h1>Build-A-Blog</h1>
     {% block content %}
     {% endblock %}
