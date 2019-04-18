@@ -1,6 +1,9 @@
 # import modules for templating, requests, redirects, flask, db stuff
 from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+
+
 
 # create app variable from Flask constructor
 app = Flask(__name__)
@@ -26,10 +29,12 @@ app.secret_key = 'P0uMx81vjH'
 # TODO: add user_id and date to Blog class
 # TODO: add keywords table with post_id relationship (?)
 class Blog(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    blog_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120))
+    date = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
     keywords = db.Column(db.String(120))
     body = db.Column(db.String(10000))
+    
 
     def __init__(self, title, keywords, body):
         self.title = title
@@ -56,7 +61,7 @@ def index():
     blogs = Blog.query.all()
 
     # sort blogs so they display in order of id (in lieu of a date attribute to sort by)
-    blogs.sort(key=lambda x: x.id)
+    blogs.sort(key=lambda x: x.blog_id)
     blogs.reverse()
 
     # data should be a sorted list of blog objects
@@ -79,8 +84,10 @@ def view_post():
     db.session.add(new_blog)
     db.session.commit()
 
+    date = new_blog.date
+
     # pass form data to viewpost.html and render it
-    return render_template("viewpost.html", title=title, keywords=keywords, 
+    return render_template("viewpost.html", title=title, date=date, keywords=keywords, 
     body=body)
 
 # allow for importing without automatic execution of this file

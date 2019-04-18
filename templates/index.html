@@ -6,6 +6,7 @@
 <!--display all posts-->
 {% for blog in blogs %}
   <h2>{{ blog.title }}</h2>
+  <p id='timestamp'>{{ blog.date }}</p>
   <p id='keywords'>{{ blog.keywords }}</p>
   <p id='body'>{{ blog.body }}</p>
 {% endfor %}
