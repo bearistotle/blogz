@@ -53,10 +53,14 @@ class User(db.Model):
 @app.route('/blog', methods=['GET', 'POST'])
 def index():
 # pull blog post data from db and pass to index.html to display
-    # data should be a list of title/keyword/body tuples or lists
-    # (or just a title: body dictionary?)
+    blogs = Blog.query.all()
 
-    return render_template("index.html")
+    # sort blogs so they display in order of id (in lieu of a date attribute to sort by)
+    blogs.sort(key=lambda x: x.id)
+    blogs.reverse()
+
+    # data should be a sorted list of blog objects
+    return render_template("index.html", blogs=blogs)
 
 @app.route('/newpost', methods=['GET', 'POST'])
 def new_post():

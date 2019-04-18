@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-# create button to pull up form for writing new posts
+<!--TODO: create button to pull up form for writing new posts-->
 
-# display all posts
-
-
+<!--display all posts-->
+{% for blog in blogs %}
+  <h2>{{ blog.title }}</h2>
+  <p id='keywords'>{{ blog.keywords }}</p>
+  <p id='body'>{{ blog.body }}</p>
+{% endfor %}
 {% endblock %}
