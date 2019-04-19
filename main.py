@@ -57,6 +57,7 @@ class User(db.Model):
 
 @app.route('/blog', methods=['GET', 'POST'])
 def index():
+    page_title = 'Home'
 # pull blog post data from db and pass to index.html to display
     blogs = Blog.query.all()
 
@@ -65,16 +66,40 @@ def index():
     blogs.reverse()
 
     # data should be a sorted list of blog objects
-    return render_template("index.html", blogs=blogs)
+    return render_template("index.html", page_title=page_title, blogs=blogs)
 
 @app.route('/newpost', methods=['GET', 'POST'])
 def new_post():
-    return render_template("newpost.html")
+    page_title = 'New Post'
+    if request.method == 'GET':
+        return render_template('newpost.html', page_title=page_title)
+
+    if request.method == 'POST':
+        title = request.form['title']
+        body = request.form['body']
+        keywords = request.form['keywords']
+
+        if not title or not body:
+            flash('Title and body fields are required.')
+            return render_template('newpost.html', page_title=page_title, title=title, body=body, keywords=keywords)
+        
+        elif len(title) > 120 or len(body) > 10000:
+            flash('Title or body of post is too long. Title max is 120 char; body max is 10000 char.')
+            return render_template('newpost.html', page_title=page_title, title=title, body=body, keywords=keywords)
+        
+        page_title = 'Published Post'
+        return redirect('/viewpost', page_title=page_title, title=title, body=body, keywords=keywords)
+    
+    else:
+        page_title = 'Home'
+        return redirect('/blog', page_title=page_title)
 
 @app.route('/viewpost', methods=['GET', 'POST'])
 def view_post():
+    page_title = 'Published Post'
     # if method is POST, then pull data from form submitted by newpost
     if request.method == 'POST':
+
         # collect form data, validate, add to db
         title = request.form['title']
         body = request.form['body']
@@ -89,7 +114,7 @@ def view_post():
         date = new_blog.date
 
         # pass form data to viewpost.html and render it
-        return render_template("viewpost.html", title=title, date=date, keywords=keywords, 
+        return render_template("viewpost.html", page_title=page_title, title=title, date=date, keywords=keywords, 
         body=body)
     
     # if method is GET, then pull blog_id from query parameter, get blog from db
@@ -102,9 +127,10 @@ def view_post():
         keywords = old_blog.keywords
         body = old_blog.body
 
-        return render_template('viewpost.html', title=title, date=date, keywords=keywords, body=body)
+        return render_template('viewpost.html', page_title=page_title, title=title, date=date, keywords=keywords, body=body)
     else:
-        return redirect('/blog')
+        page_title = 'Home'
+        return redirect('/blog', page_title=page_title)
 # allow for importing without automatic execution of this file
 if __name__ == "__main__":
     app.run()
