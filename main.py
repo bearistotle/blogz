@@ -72,27 +72,29 @@ def index():
 def new_post():
     page_title = 'New Post'
     if request.method == 'GET':
-        return render_template('newpost.html', page_title=page_title)
+        # TODO: pull needed data from args and pass to new post
+        if request.args:
+            if request.args.get('title'):
+                title = request.args.get('title')
+            else: 
+                title = ''
+            if request.args.get('body'):
+                body = request.args.get('body')
+            else:
+                body = ''
+            if request.args.get('keywords'):
+                keywords = request.args.get('keywords')
+            else:
+                keywords = ''
+            
 
-    if request.method == 'POST':
-        title = request.form['title']
-        body = request.form['body']
-        keywords = request.form['keywords']
+            return render_template('newpost.html', page_title=page_title, title=title, body=body, keywords=keywords)
 
-        if not title or not body:
-            flash('Title and body fields are required.')
-            return render_template('newpost.html', page_title=page_title, title=title, body=body, keywords=keywords)
-        
-        elif len(title) > 120 or len(body) > 10000:
-            flash('Title or body of post is too long. Title max is 120 char; body max is 10000 char.')
-            return render_template('newpost.html', page_title=page_title, title=title, body=body, keywords=keywords)
-        
-        page_title = 'Published Post'
-        return redirect('/viewpost', page_title=page_title, title=title, body=body, keywords=keywords)
-    
+        else:
+            return render_template('newpost.html', page_title=page_title)
+
     else:
-        page_title = 'Home'
-        return redirect('/blog', page_title=page_title)
+        return redirect('/blog')
 
 @app.route('/viewpost', methods=['GET', 'POST'])
 def view_post():
@@ -106,6 +108,14 @@ def view_post():
         keywords = request.form['keywords']
 
         # TODO: validate and redirect to newpost page with error msgs
+        if not title or not body:
+            flash('Title and body fields are required.')
+            return redirect('/newpost?title={0}&body={1}&keywords={2}'.format(title, body, keywords))
+        
+        elif len(title) > 120 or len(body) > 10000:
+            flash('Title or body of post is too long. Title max is 120 char; body max is 10000 char.')
+            return redirect('/newpost?title={0}&body={1}&keywords={2}'.format(title, body, keywords))
+        
         # add form data to db
         new_blog = Blog(title, keywords, body)
         db.session.add(new_blog)
