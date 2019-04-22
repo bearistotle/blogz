@@ -71,36 +71,21 @@ def index():
 @app.route('/newpost', methods=['GET', 'POST'])
 def new_post():
     page_title = 'New Post'
+
     if request.method == 'GET':
-        # TODO: pull needed data from args and pass to new post
         if request.args:
-            if request.args.get('title'):
-                title = request.args.get('title')
-            else: 
-                title = ''
-            if request.args.get('body'):
-                body = request.args.get('body')
-            else:
-                body = ''
-            if request.args.get('keywords'):
-                keywords = request.args.get('keywords')
-            else:
-                keywords = ''
-            
+            title = request.args.get('title')
+            body = request.args.get('body')
+            keywords = request.args.get('keywords')
 
             return render_template('newpost.html', page_title=page_title, title=title, body=body, keywords=keywords)
-
+        
         else:
             return render_template('newpost.html', page_title=page_title)
 
-    else:
-        return redirect('/blog')
 
-@app.route('/viewpost', methods=['GET', 'POST'])
-def view_post():
-    page_title = 'Published Post'
-    # if method is POST, then pull data from form submitted by newpost
-    if request.method == 'POST':
+
+    elif request.method == 'POST':
 
         # collect form data, validate, add to db
         title = request.form['title']
@@ -111,7 +96,7 @@ def view_post():
         if not title or not body:
             flash('Title and body fields are required.')
             return redirect('/newpost?title={0}&body={1}&keywords={2}'.format(title, body, keywords))
-        
+
         elif len(title) > 120 or len(body) > 10000:
             flash('Title or body of post is too long. Title max is 120 char; body max is 10000 char.')
             return redirect('/newpost?title={0}&body={1}&keywords={2}'.format(title, body, keywords))
@@ -121,26 +106,26 @@ def view_post():
         db.session.add(new_blog)
         db.session.commit()
 
-        date = new_blog.date
-
         # pass form data to viewpost.html and render it
-        return render_template("viewpost.html", page_title=page_title, title=title, date=date, keywords=keywords, 
-        body=body)
-    
-    # if method is GET, then pull blog_id from query parameter, get blog from db
-    elif request.method == 'GET':
-        old_blog_id = request.args.get('id')
-        old_blog = Blog.query.get(old_blog_id)
-
-        title = old_blog.title
-        date = old_blog.date
-        keywords = old_blog.keywords
-        body = old_blog.body
-
-        return render_template('viewpost.html', page_title=page_title, title=title, date=date, keywords=keywords, body=body)
+        return redirect('/viewpost?id={0}'.format(new_blog.blog_id))
     else:
-        page_title = 'Home'
-        return redirect('/blog', page_title=page_title)
+        return redirect('/blog')
+
+@app.route('/viewpost', methods=['GET'])
+def view_post():
+    page_title = 'Published Post'        
+    
+    # pull blog_id from query parameter, get blog from db
+    old_blog_id = request.args.get('id')
+    old_blog = Blog.query.get(old_blog_id)
+
+    title = old_blog.title
+    date = old_blog.date
+    keywords = old_blog.keywords
+    body = old_blog.body
+
+    return render_template('viewpost.html', page_title=page_title, title=title, date=date, keywords=keywords, body=body)
+
 # allow for importing without automatic execution of this file
 if __name__ == "__main__":
     app.run()

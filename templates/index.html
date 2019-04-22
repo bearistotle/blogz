@@ -5,7 +5,7 @@
 
 <!--display all posts-->
 {% for blog in blogs %}
-  <a href='/viewpost?id={{ blog.blog_id }}'><h2>{{ blog.title }}</h2></a>
+  <a href='/viewpost?id={{ blog.blog_id }}' style='color: #73a371;'><h2>{{ blog.title }}</h2></a>
   <p id='timestamp'>{{ blog.date }}</p>
   <p id='keywords'><strong>Keywords:</strong> {{ blog.keywords }}</p>
   <p id='body'>{{ blog.body }}</p>
