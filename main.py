@@ -1,76 +1,50 @@
 # import modules for templating, requests, redirects, flask, db stuff
 from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from hashutils import check_pw_hash
+from app import app, db
+from models import Blog, User
 
+# TODO: Add pagination
 
-
-# create app variable from Flask constructor
-app = Flask(__name__)
-
-# configure app
-# turn debug mode on so error msgs show up in browser too
-app.config['DEBUG'] = True
-
-# set up db connection string;
-# db_type+driver://db_username:db_password@server:port/db_name
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://build-a-blog:myblog@localhost:8889/build-a-blog'
-
-# turn on echo to see sql commands in cmd prompt
-app.config['SQLALCHEMY_ECHO'] = True
-
-# create db variable from SQLALchemy constructor (pass in app var)
-db = SQLAlchemy(app)
-
-# set secret key for sessions in Flask
-app.secret_key = 'P0uMx81vjH'
-
-# create classes for tables in db (user, post)
-# TODO: add user_id and date to Blog class
-# TODO: add keywords table with post_id relationship (?)
-class Blog(db.Model):
-    blog_id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(120))
-    date = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
-    keywords = db.Column(db.String(120))
-    body = db.Column(db.String(10000))
-    
-
-    def __init__(self, title, keywords, body):
-        self.title = title
-        self.keywords = keywords
-        self.body = body
-
-'''
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(120), unique=True)
-    password = db.Column(db.String(120))
-    posts = db.relationship('Blog', backref='owner')
-
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
-'''
-
-# TODO: create handlers/routes for main page, blog post form page, posted blog page
+@app.route('/', methods=['GET'])
+def index():
+    users = User.query.all()
+    return render_template('index.html', users=users)
 
 @app.route('/blog', methods=['GET', 'POST'])
-def index():
-    page_title = 'Home'
-# pull blog post data from db and pass to index.html to display
+def blog():
+
+    if request.args:
+
+        # get all blogs by user
+        user_id = request.args.get('user')
+        user_blogs = Blog.query.filter_by(owner_id=user_id).all()
+
+        # sort blogs by id (lower = earlier)
+        user_blogs.sort(key=lambda x: x.blog_id)
+        user_blogs.reverse()
+
+        user = [User.query.get(user_id)]
+
+        return render_template('blogs.html', blogs=user_blogs, users=user)
+
+# pull all blog post data from db and pass to blogs.html to display
     blogs = Blog.query.all()
 
     # sort blogs so they display in order of id (in lieu of a date attribute to sort by)
     blogs.sort(key=lambda x: x.blog_id)
     blogs.reverse()
+    
+    users = User.query.all()
 
     # data should be a sorted list of blog objects
-    return render_template("index.html", page_title=page_title, blogs=blogs)
+    return render_template("blogs.html",  blogs=blogs, users=users)
 
 @app.route('/newpost', methods=['GET', 'POST'])
 def new_post():
-    page_title = 'New Post'
+
+    username = session['user']
 
     if request.method == 'GET':
         if request.args:
@@ -78,10 +52,11 @@ def new_post():
             body = request.args.get('body')
             keywords = request.args.get('keywords')
 
-            return render_template('newpost.html', page_title=page_title, title=title, body=body, keywords=keywords)
+            return render_template('newpost.html',  
+            title=title, body=body, keywords=keywords, user=username)
         
         else:
-            return render_template('newpost.html', page_title=page_title)
+            return render_template('newpost.html',  user=username)
 
 
 
@@ -95,14 +70,21 @@ def new_post():
         # TODO: validate and redirect to newpost page with error msgs
         if not title or not body:
             flash('Title and body fields are required.')
-            return redirect('/newpost?title={0}&body={1}&keywords={2}'.format(title, body, keywords))
+            return redirect('/newpost?title={0}&body={1}&keywords={2}'.format(
+                title, body, keywords))
 
         elif len(title) > 120 or len(body) > 10000:
             flash('Title or body of post is too long. Title max is 120 char; body max is 10000 char.')
-            return redirect('/newpost?title={0}&body={1}&keywords={2}'.format(title, body, keywords))
+            return redirect('/newpost?title={0}&body={1}&keywords={2}'.format(
+                title, body, keywords))
         
-        # add form data to db
-        new_blog = Blog(title, keywords, body)
+        # get user id
+        username = session['user']
+        user = User.query.filter_by(username=username).first()
+        owner_id = user.user_id
+
+        # create Blog object and add to db
+        new_blog = Blog(owner_id, title, keywords, body)
         db.session.add(new_blog)
         db.session.commit()
 
@@ -112,19 +94,97 @@ def new_post():
         return redirect('/blog')
 
 @app.route('/viewpost', methods=['GET'])
-def view_post():
-    page_title = 'Published Post'        
+def view_post():       
     
     # pull blog_id from query parameter, get blog from db
-    old_blog_id = request.args.get('id')
-    old_blog = Blog.query.get(old_blog_id)
+    pub_blog_id = request.args.get('id')
+    pub_blog = Blog.query.get(pub_blog_id)
 
-    title = old_blog.title
-    date = old_blog.date
-    keywords = old_blog.keywords
-    body = old_blog.body
+    user = User.query.get(pub_blog.owner_id)
 
-    return render_template('viewpost.html', page_title=page_title, title=title, date=date, keywords=keywords, body=body)
+    return render_template('viewpost.html', blog=pub_blog, user=user)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    
+    if request.method == 'GET':
+        return render_template('login.html')
+
+    username = request.form['username']
+    password = request.form['password']
+    
+    user = User.query.filter_by(username=username).first()
+
+    #validate username
+    if not user:
+        flash('Invalid username or password.')
+        return render_template('login.html')
+    
+    #validate password
+    if not check_pw_hash(password, user.pw_hash):
+        flash('Invalid username or password.')
+        return render_template('login.html')
+    
+    # all validation passed; add user to session
+    session['user'] = username
+    return redirect('/newpost')
+    
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+
+    if request.method == 'GET':
+        return render_template('signup.html')
+
+    # get data from form and validate
+    username = request.form['username']
+    password = request.form['password']
+    verify = request.form['verify']
+
+    if not username or not password:
+        flash('Username and password are both required.')
+        return render_template('signup.html')
+
+    if User.query.filter_by(username=username).first():
+        flash('That username is already taken. Please choose another.')
+        return render_template('signup.html')
+
+    if 3 > len(username) or 3 > len(password):
+        flash('Username and password must be between 3 and 20 characters.')
+        return render_template('signup.html')
+
+    if 20 < len(username) or 20 < len(password):
+        flash('Username and password must be between 3 and 20 characters.')
+        return render_template('signup.html')
+
+    if password != verify:
+        flash('Passwords don\'t match.')
+        return render_template('signup.html')
+    
+    # Note: password salted and hashed by User class constructor
+    new_user = User(username, password)
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    session['user'] = username
+
+    return redirect('/newpost')
+
+@app.route('/logout', methods=['GET'])
+def logout():
+    del session['user']
+    return redirect('/blog')
+
+@app.before_request
+def require_login():
+
+    allowed_routes = ['login', 'signup', 'index']
+
+    if request.endpoint not in allowed_routes and 'user' not in session:
+
+        return redirect('/login')
 
 # allow for importing without automatic execution of this file
 if __name__ == "__main__":

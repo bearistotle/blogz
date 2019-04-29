@@ -2,9 +2,10 @@
 
 {% block content %}
 <!--TODO: create css style for elements on this page-->
-<h2 style="color: #73a371;">{{ title }}</h2>
-<p id='timestamp'>{{ date }}</p>
-<p id="keywords">{{ keywords }}</p>
-<p id="body">{{ body }}</p>
+<h2 style="text-align: center; padding-bottom: 25px; color: #73a371;">{{ blog.title }}</h2>
+<p id='timestamp'>{{ blog.date }}</p>
+<p id="keywords">{{ blog.keywords }}</p>
+<p id="body">{{ blog.body }}</p>
+<p id='author'>Written by <a href='/blog?user={{ blog.owner_id }}'>{{ user.username }}</a></p>
 
 {% endblock %}

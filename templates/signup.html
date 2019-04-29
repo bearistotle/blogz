@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!--TODO: create signup form-->
+<h2 style="text-align: center; padding-bottom: 25px;">Sign Up</h2> 
+<form action='/signup' method='post'>
+    <label for='username'>Username:</label>
+    <input id='username' name='username' type='text' />
+    <label for='password'>Password:</label>
+    <input id='password' name='password' type='password' />
+    <label for='verify'>Verify Password:</label>
+    <input id='verify' name='verify' type='password' />
+    <input type='submit' value='Sign Up' />
+</form>
+{% endblock %}

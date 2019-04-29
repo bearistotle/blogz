@@ -1,13 +1,11 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
-<!--TODO: create button to pull up form for writing new posts-->
+<h2 style='text-align: center;'>Bloggers</h2>
+<ul>
+    {% for user in users %}
+    <a href='/blog?user={{ user.user_id }}'><li>{{ user.username }}</li></a>
+    {% endfor %}
+</ul>
 
-<!--display all posts-->
-{% for blog in blogs %}
-  <a href='/viewpost?id={{ blog.blog_id }}' style='color: #73a371;'><h2>{{ blog.title }}</h2></a>
-  <p id='timestamp'>{{ blog.date }}</p>
-  <p id='keywords'><strong>Keywords:</strong> {{ blog.keywords }}</p>
-  <p id='body'>{{ blog.body }}</p>
-{% endfor %}
 {% endblock %}

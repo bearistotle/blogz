@@ -11,53 +11,54 @@
     <title>Build-a-Blog</title>
   </head>
   <body style="background-color:#566356; color: #ffffff; font-family: Georgia;">
-    </div>
-    <div class="container" style="height: 100vh;">
-        <div class="row">
-            <div class="col" style="background-color:#042704; height: 100vh; padding-top: 15px; margin-top: 15px; border-radius: 20px;">
-              <h1 style="text-align: center;">Build-a-Blog</h1>
-              <ul class="nav flex-column">
-                  <li class="nav-item">
-                    <a class="nav-link active" href="/blog">Home</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/newpost">New Post</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link disabled" href="/blog" tabindex="-1" aria-disabled="true">Log In</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link disabled" href="/blog" tabindex="-1" aria-disabled="true">Register</a>
-                  </li>
-                </ul>
-            </div>
-          <div class="col-6" style="background-color:#083608; border-radius: 20px; margin-left: 5px; margin-top: 15px; padding-top: 10px;">
-            <h2 style="text-align: center; padding-bottom: 25px;">{{ page_title }}</h2>  
-            {% if get_flashed_messages() %}
-              <ul>
-              {% for msg in get_flashed_messages() %}
-                <li style='color: red;'>{{ msg }}</li>
-              {% endfor %}
-              </ul>
-            {% endif %}
-            {% block content %}
-            {% endblock %}
-          </div>
-          <div class="col" style="background-color: #177717; height: 100vh; padding-top: 10px; 
-          margin-left: 5px; margin-top: 15px; border-radius: 20px;">
-            <h3 style='text-align: center;'>User Name</h3>
-            <p style='text-align: center;'>This is where an avatar image, brief bio, and link to the user's profile would go.</p>
-            <h3 style="padding-top: 15px; text-align: center;">Keywords:</h3>
-            <ul>
-              <li>Keywords</li>
-              <li>That Link</li>
-              <li>To Posts</li>
-              <li>Go Here</li>
+    <div class="container-fluid" style="height: 100vh;">
+      <div class="row">
+        <div class="col-sm-3" style="background-color:#042704; height: 100vh; padding-top: 15px; margin-top: 15px; border-radius: 20px; position: fixed;">
+          <h1 style="text-align: center; font-variant: small-caps;">Blogz</h1>
+          <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link active" href="/">Home</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link active" href="/blog">All Posts</a>
+                </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/newpost">New Post</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/login">Log In</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/signup">Sign Up</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="/logout">Log Out</a>
+                </li>
             </ul>
-          </div>
         </div>
-      
-  
+        <div class="col-sm-6 " style="background-color:#083608; border-radius: 20px; margin-left: 5px; margin-top: 15px; padding-top: 10px;"> 
+          {% if get_flashed_messages() %}
+            <ul>
+            {% for msg in get_flashed_messages() %}
+              <li style='color: red;'>{{ msg }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+          {% block content %}
+          {% endblock %}
+        </div>
+        <div class="col-sm-3" style="background-color: #177717; height: 100vh; padding-top: 10px; margin-left: 5px; margin-top: 15px; border-radius: 20px; position: fixed;">
+          <h3 style='text-align: center;'>User Name</h3>
+          <p style='text-align: center;'>This is where an avatar image, brief bio, and link to the user's profile would go.</p>
+          <h3 style="padding-top: 15px; text-align: center;">Keywords:</h3>
+          <ul>
+            <li>Keywords</li>
+            <li>That Link</li>
+            <li>To Posts</li>
+            <li>Go Here</li>
+          </ul>
+        </div>
+      </div>
     </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
