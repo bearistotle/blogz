@@ -13,30 +13,32 @@
   <body style="background-color:#566356; color: #ffffff; font-family: Georgia;">
     <div class="container-fluid" style="height: 100vh;">
       <div class="row">
-        <div class="col-sm-3" style="background-color:#042704; height: 100vh; padding-top: 15px; margin-top: 15px; border-radius: 20px; position: fixed;">
-          <h1 style="text-align: center; font-variant: small-caps;">Blogz</h1>
-          <ul class="nav flex-column">
-              <li class="nav-item">
-                <a class="nav-link active" href="/">Home</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link active" href="/blog">All Posts</a>
+        <div class="col-md-3">
+          <div class="position-fixed" style="background-color:#042704; height: 100vh; width: 23%; padding-top: 15px; margin-top: 15px; border-radius: 20px;">
+            <h1 style="text-align: center; font-variant: small-caps;">Blogz</h1>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a class="nav-link active" href="/">Home</a>
                 </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/newpost">New Post</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/login">Log In</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/signup">Sign Up</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="/logout">Log Out</a>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/blog">All Posts</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/newpost">New Post</a>
                 </li>
-            </ul>
+                <li class="nav-item">
+                  <a class="nav-link" href="/login">Log In</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/signup">Sign Up</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Log Out</a>
+                  </li>
+              </ul>
+          </div>
         </div>
-        <div class="col-sm-6 " style="background-color:#083608; border-radius: 20px; margin-left: 5px; margin-top: 15px; padding-top: 10px;"> 
+        <div class="col-md-6" style="background-color:#083608; border-radius: 20px; min-height: 100vh; margin-top: 15px; padding-top: 10px;"> 
           {% if get_flashed_messages() %}
             <ul>
             {% for msg in get_flashed_messages() %}
@@ -47,16 +49,18 @@
           {% block content %}
           {% endblock %}
         </div>
-        <div class="col-sm-3" style="background-color: #177717; height: 100vh; padding-top: 10px; margin-left: 5px; margin-top: 15px; border-radius: 20px; position: fixed;">
-          <h3 style='text-align: center;'>User Name</h3>
-          <p style='text-align: center;'>This is where an avatar image, brief bio, and link to the user's profile would go.</p>
-          <h3 style="padding-top: 15px; text-align: center;">Keywords:</h3>
-          <ul>
-            <li>Keywords</li>
-            <li>That Link</li>
-            <li>To Posts</li>
-            <li>Go Here</li>
-          </ul>
+        <div class="col-md-3">
+          <div class="position-fixed" style="background-color: #177717; height: 100vh; padding-top: 10px; margin-top: 15px; border-radius: 20px;">
+            <h3 style='text-align: center;'>User Name</h3>
+            <p style='text-align: center;'>This is where an avatar image, brief bio, and link to the user's profile would go.</p>
+            <h3 style="padding-top: 15px; text-align: center;">Keywords:</h3>
+            <ul>
+              <li>Keywords</li>
+              <li>That Link</li>
+              <li>To Posts</li>
+              <li>Go Here</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
